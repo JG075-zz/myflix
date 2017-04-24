@@ -4,14 +4,14 @@ var express = require('express'),
   Article = mongoose.model('Article');
 
 module.exports = function (app) {
-  app.use('/', router);
+  app.use('/api', router);
 };
 
 router.get('/', function (req, res, next) {
-  res.send('index');
+  res.send('api route');
 });
 
-router.get('/api/movies', function(req, res, next){
+router.get('/movies', function(req, res, next){
   if(req.query.page) {
     if(req.query.sort_by == "date_desc") {
       res.send('page: ' + req.query.page + ', sort_by: date_desc');
@@ -27,6 +27,6 @@ router.get('/api/movies', function(req, res, next){
   }
 });
 
-router.get('/api/movies/:title', function(req, res, next){
+router.get('/movies/:title', function(req, res, next){
   if (req.params.title) res.send('movie: ' + req.params.title);
 });
