@@ -1,31 +1,20 @@
-var express = require('express'),
-  router = express.Router(),
-  mongoose = require('mongoose');
+var Movie = require('../models/movie');
 
-module.exports = function (app) {
-  app.use('/api', router);
+exports.index = function(req, res) {
+  return res.send('ok');
 };
 
-router.get('/', function (req, res, next) {
-  res.send('api route');
-});
+exports.movies = function(req, res) {
+  // give back a json array of movie objects
+  // should be limited to the first page e.g. first 20 results
+  Movie.find().sort('released').exec(function(error, movies) {
+    if (error) {
+      return res.send(400, {
+        message: error
+      });
+    }
 
-router.get('/movies', function(req, res, next){
-  if(req.query.page) {
-    if(req.query.sort_by == "date_desc") {
-      res.send('page: ' + req.query.page + ', sort_by: date_desc');
-    }
-    else if (req.query.sort_by == "date_asc") {
-      res.send('page: ' + req.query.page + ', sort_by: date_asc');
-    }
-    else {
-      res.send('page: ' + req.query.page);
-    }
-  } else {
-    res.send('page 1');
-  }
-});
+    res.send(movies);
 
-router.get('/movies/:title', function(req, res, next){
-  if (req.params.title) res.send('movie: ' + req.params.title);
-});
+  });
+};
