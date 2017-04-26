@@ -1,7 +1,3 @@
-// exports a singleton
-// .fetch() takes a movie title
-// returns an object with updated values ready to be saved
-
 function InfoFetcher() {
   this.omdbAPI = require('./omdbAPI');
 }
