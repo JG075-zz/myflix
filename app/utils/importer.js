@@ -50,10 +50,9 @@ module.exports = importer;
 
 // run the importer when called from the command line
 if (require.main === module) {
-  mongoose.connect(config.url);
-
-  mongoose.connection.on('error', function(){
-    throw new Error('MongoDB Connection Error. Make sure MongoDB is running');
+  mongoose.connect(config.db);
+  mongoose.connection.on('error', function(err){
+    if (err) throw err;
   });
 
   var imported = fs.readFileSync(process.argv[2], 'utf8');
