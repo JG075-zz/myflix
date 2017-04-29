@@ -66,10 +66,12 @@ describe('Importer', function() {
     expect(movieStub.prototype.save.called).to.be.true;
   });
 
-  it('calls Movie.count() to get the beforeCount', function() {
-    movieStub.count = sinon.spy();
+  it('calls Movie.count() to get the before and after document count', function() {
+    var countStub = sinon.stub(movieStub, 'count', function(err, done){
+      done();
+    });
     importer(myJSON);
-    expect(movieStub.count.called).to.be.true;
+    expect(countStub.calledTwice).to.be.true;
   });
 
   function runProxquire() {

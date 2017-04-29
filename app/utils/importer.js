@@ -1,8 +1,8 @@
-var infoFetcher = require('../helpers/infoFetcher');
-var mongoose = require('mongoose');
-var config = require('../../config/config');
-var Movie = require('../models/movie');
-var fs = require('fs');
+var infoFetcher = require('../helpers/infoFetcher'),
+    mongoose = require('mongoose'),
+    config = require('../../config/config'),
+    Movie = require('../models/movie'),
+    fs = require('fs');
 
 function validateJSON(body) {
   try {
@@ -13,8 +13,8 @@ function validateJSON(body) {
   }
 }
 
-function updateAndSave(done) {
-  parsedFile.forEach(function(item) {
+function updateAndSave(file, done) {
+  file.forEach(function(item) {
     infoFetcher.fetch(item.title, function(updatedItem) {
       var movie = new Movie(updatedItem);
       movie.save(function(error) {
@@ -33,17 +33,20 @@ function getDocumentCount(done) {
 }
 
 function importer(file) {
-  parsedFile = validateJSON(file);
+  var parsedFile = validateJSON(file);
   if (!parsedFile) throw new Error('No file or wrong type given');
   if (!(parsedFile instanceof Array)) throw new Error('Empty or not a JSON array');
 
   getDocumentCount(function(count) {
-    updateAndSave(function(){
-
+    var beforeCount = count;
+    updateAndSave(parsedFile, function(){
+      getDocumentCount(function(count) {
+        if(require.main === module){ // print results when called from the command line
+          console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + count);
+        }
+      });
     });
   });
-
-
 }
 
 module.exports = importer;
