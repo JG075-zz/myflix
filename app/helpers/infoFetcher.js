@@ -1,5 +1,7 @@
+var omdbAPI = require('./omdbAPI');
+
 function InfoFetcher() {
-  this.omdbAPI = require('./omdbAPI');
+  this.omdbAPI = new omdbAPI();
 }
 
 InfoFetcher.prototype.fetch = function (title, done) {
