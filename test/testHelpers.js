@@ -35,7 +35,7 @@ var formattedMovie = {
   runtime: imdbResponse.Runtime,
   genre: imdbResponse.Genre,
   director: imdbResponse.Director,
-  writers: imdbResponse.Writers,
+  writer: imdbResponse.Writer,
   actors: imdbResponse.Actors,
   plot: imdbResponse.Plot,
   language: imdbResponse.Language,

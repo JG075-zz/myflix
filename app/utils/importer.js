@@ -13,23 +13,28 @@ function validateJSON(body) {
   }
 }
 
+var itemsProcessed = 0;
+
 function updateAndSave(file, done) {
-  file.forEach(function(item) {
+  file.forEach(function(item, index, array) {
     infoFetcher.fetch(item.title, function(updatedItem) {
       var movie = new Movie(updatedItem);
       movie.save(function(error) {
         if(error) throw new Error(error);
+        itemsProcessed++;
+        if(itemsProcessed === array.length) {
+          done();
+        }
       });
     });
   });
-  done();
 }
 
 function getDocumentCount(done) {
-  Movie.count({}, function(err, count) {
-    if (err) throw err;
-    done(count);
-  });
+    Movie.count({}, function(err, count) {
+      if (err) throw err;
+      done(count);
+    });
 }
 
 function importer(file) {
@@ -37,12 +42,12 @@ function importer(file) {
   if (!parsedFile) throw new Error('No file or wrong type given');
   if (!(parsedFile instanceof Array)) throw new Error('Empty or not a JSON array');
 
-  getDocumentCount(function(count) {
-    var beforeCount = count;
+  getDocumentCount(function(beforeCount) {
     updateAndSave(parsedFile, function(){
-      getDocumentCount(function(count) {
+      getDocumentCount(function(afterCount) {
         if(require.main === module){ // print results when called from the command line
-          console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + count);
+          console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount);
+          process.exit();
         }
       });
     });
@@ -53,6 +58,7 @@ module.exports = importer;
 
 // run the importer when called from the command line
 if (require.main === module) {
+  mongoose.Promise = global.Promise;
   mongoose.connect(config.db);
   mongoose.connection.on('error', function(err){
     if (err) throw err;

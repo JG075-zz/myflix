@@ -8,7 +8,7 @@ var movieSchema = new Schema({
   runtime: { type: String, required: true },
   genre: { type: String, required: true },
   director: { type: String, required: true },
-  writers: { type: String, required: true },
+  writer: { type: String, required: true },
   actors: { type: String, required: true },
   plot: { type: String, required: true },
   language: { type: String, required: true },

@@ -51,7 +51,6 @@ describe('Importer', function() {
   it('should create a new movie for each item from infoFetch', function() {
     importer(myJSON);
     var movieTitles = [[{ title: 'Forest Gump' }], [{ title: 'Madagascar'}], [{ title: 'Inception'}]];
-    // converts each to JSON to compare array of objects
     expect(JSON.stringify(movieStub.args) == JSON.stringify(movieTitles)).to.be.true;
   });
 
@@ -62,6 +61,9 @@ describe('Importer', function() {
   });
 
   it('calls Movie.count() to get the before and after document count', function() {
+    movieStub.prototype.save = sinon.spy(function(done) {
+      done();
+    });
     importer(myJSON);
     expect(movieStub.count.calledTwice).to.be.true;
   });

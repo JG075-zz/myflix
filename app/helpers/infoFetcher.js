@@ -12,7 +12,7 @@ InfoFetcher.prototype.formatMovie = function (movie) {
           runtime: movie.Runtime,
           genre: movie.Genre,
           director: movie.Director,
-          writers: movie.Writers,
+          writer: movie.Writer,
           actors: movie.Actors,
           plot: movie.Plot,
           language: movie.Language,

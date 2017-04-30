@@ -13,7 +13,7 @@ describe('Movie', function() {
       expect(err.errors.runtime).to.exist;
       expect(err.errors.genre).to.exist;
       expect(err.errors.director).to.exist;
-      expect(err.errors.writers).to.exist;
+      expect(err.errors.writer).to.exist;
       expect(err.errors.actors).to.exist;
       expect(err.errors.plot).to.exist;
       expect(err.errors.language).to.exist;
@@ -63,7 +63,7 @@ describe('Movie', function() {
       runtime: '162 mins',
       genre: 'Action',
       director: 'John Doe',
-      writers: 'Jane Doe',
+      writer: 'Jane Doe',
       actors: 'Foo, Bar, Baz',
       plot: 'Test',
       language: 'English',
