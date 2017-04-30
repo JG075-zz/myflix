@@ -10,12 +10,12 @@ describe('Importer', function() {
 
   beforeEach(function() {
     infoFetcherStub = {
-      fetch: function(title, done) { done({title: title});}
+      fetch: sinon.spy(function(title, done) { done({title: title});})
     };
-    movieStub = function(opts) {};
-    movieStub.count = function(opts, done) {
+    movieStub = sinon.spy(function(opts) {});
+    movieStub.count = sinon.spy(function(opts, done) {
       done();
-    };
+    });
     importer = proxyquire('../../app/utils/importer', { '../models/movie': movieStub, '../helpers/infoFetcher': infoFetcherStub });
   });
 
@@ -41,19 +41,14 @@ describe('Importer', function() {
   });
 
   it('shoud call infoFetch with each title in the array', function() {
-    sinon.spy(infoFetcherStub, 'fetch');
     importer(myJSON);
     var args = infoFetcherStub.fetch.args.map(function(element) {
       return element[0]; // removes callback function from arguments
     });
     expect(args == [['Forest Gump'], ['Madagascar'], ['Inception']].toString()).to.be.true;
-    infoFetcherStub.fetch.restore();
   });
 
   it('should create a new movie for each item from infoFetch', function() {
-    movieStub = sinon.spy();
-    movieStub.count = function(opts, done) { done();};
-    runProxquire(); // need to run proxyquire again to use the updated movieStub
     importer(myJSON);
     var movieTitles = [[{ title: 'Forest Gump' }], [{ title: 'Madagascar'}], [{ title: 'Inception'}]];
     // converts each to JSON to compare array of objects
@@ -67,15 +62,8 @@ describe('Importer', function() {
   });
 
   it('calls Movie.count() to get the before and after document count', function() {
-    var countStub = sinon.stub(movieStub, 'count', function(err, done){
-      done();
-    });
     importer(myJSON);
-    expect(countStub.calledTwice).to.be.true;
+    expect(movieStub.count.calledTwice).to.be.true;
   });
-
-  function runProxquire() {
-    importer = proxyquire('../../app/utils/importer', { '../models/movie': movieStub, '../helpers/infoFetcher': infoFetcherStub });
-  }
 
 });
