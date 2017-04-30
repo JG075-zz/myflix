@@ -1,13 +1,17 @@
 var expect = require('chai').expect,
     proxyquire =  require('proxyquire'),
-    sinon = require('sinon');
+    sinon = require('sinon'),
+    testHelpers = require('../testHelpers');
 
 describe('InfoFetcher', function() {
 
   var fakeOmdbAPI, infoFetcher;
 
   beforeEach(function() {
-    fakeOmdbAPI = { get: sinon.spy() };
+    fakeOmdbAPI = function() {};
+    fakeOmdbAPI.prototype.get = sinon.spy(function(title, done){
+      done(testHelpers.imdbResponse);
+    });
     infoFetcher = proxyquire('../../app/helpers/infoFetcher', { './omdbAPI': fakeOmdbAPI });
   });
 
@@ -17,22 +21,18 @@ describe('InfoFetcher', function() {
       expect(infoFetcher.fetch).to.exist;
     });
 
-    it('should pass the title to omdb request', function() {
-      infoFetcher.fetch('movie');
-      expect(fakeOmdbAPI.get.args[0][0]).to.eql('movie');
-    });
-
-    it('should give the function called in a movie object', function(done) {
-      var fakeMovie = { title: "movie", released: "09/05/1998" };
-      fakeOmdbAPI = { get: function(title, done) {
-        done(fakeMovie);}
-      };
-      infoFetcher = proxyquire('../../app/helpers/infoFetcher', { './omdbAPI': fakeOmdbAPI });
-      infoFetcher.fetch('movie', function(movie) {
-        expect(movie).to.eq(fakeMovie);
+    it('should pass the title to omdb request', function(done) {
+      infoFetcher.fetch('hood', function(){
+        expect(fakeOmdbAPI.prototype.get.args[0][0]).to.eql('hood');
         done();
       });
+    });
 
+    it('should give the function called in a formatted movie object', function(done) {
+      infoFetcher.fetch('Toy Story 3', function(movie) {
+        expect(JSON.stringify(movie)).to.eq(JSON.stringify(testHelpers.formattedMovie));
+        done();
+      });
     });
 
   });
