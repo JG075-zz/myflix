@@ -19,9 +19,9 @@ InfoFetcher.prototype.formatMovie = function (movie) {
           country: movie.Country,
           poster: movie.Poster,
           ratings: {
-            meta_score: Number(movie.Metascore),
-            imdb_rating:Number(movie.imdbRating),
-            rotten_tomatoes: Number(movie.Ratings[1].Value.replace('%','')),
+            meta_score: movie.Metascore,
+            imdb_rating:movie.imdbRating,
+            rotten_tomatoes: movie.Ratings[1].Value
           },
           imdb_id: movie.imdbID,
           type: movie.Type,

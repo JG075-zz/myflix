@@ -27,34 +27,6 @@ describe('Movie', function() {
     });
   });
 
-  it('should not accept rating values exceeding the limit', function(done){
-    var movie = new Movie({
-      'ratings.meta_score': 101,
-      'ratings.imdb_rating': 11,
-      'ratings.rotten_tomatoes': 101,
-    });
-    movie.validate(function(err) {
-      expect(err.errors['ratings.meta_score']).to.exist;
-      expect(err.errors['ratings.imdb_rating']).to.exist;
-      expect(err.errors['ratings.rotten_tomatoes']).to.exist;
-      done();
-    });
-  });
-
-  it('should not accept rating values under the limit', function(done){
-    var movie = new Movie({
-      'ratings.meta_score': -1,
-      'ratings.imdb_rating': -1,
-      'ratings.rotten_tomatoes': -1,
-    });
-    movie.validate(function(err) {
-      expect(err.errors['ratings.meta_score']).to.exist;
-      expect(err.errors['ratings.imdb_rating']).to.exist;
-      expect(err.errors['ratings.rotten_tomatoes']).to.exist;
-      done();
-    });
-  });
-
   it('should accept valid entries', function(done){
     var movie = new Movie({
       title: 'Test',
@@ -70,9 +42,9 @@ describe('Movie', function() {
       country: 'United Kingdom',
       poster: 'http://example.com/img.jpg',
       ratings: {
-        meta_score: 58,
-        imdb_rating: 6.6,
-        rotten_tomatoes: 88,
+        meta_score: '58',
+        imdb_rating: '6.6',
+        rotten_tomatoes: '88%',
       },
       imdb_id: '001',
       type: 'Movie',

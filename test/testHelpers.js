@@ -42,9 +42,9 @@ var formattedMovie = {
   country: imdbResponse.Country,
   poster: imdbResponse.Poster,
   ratings: {
-    meta_score: Number(imdbResponse.Metascore),
-    imdb_rating:Number(imdbResponse.imdbRating),
-    rotten_tomatoes: Number(imdbResponse.Ratings[1].Value.replace('%','')),
+    meta_score: imdbResponse.Metascore,
+    imdb_rating: imdbResponse.imdbRating,
+    rotten_tomatoes: imdbResponse.Ratings[1].Value,
   },
   imdb_id: imdbResponse.imdbID,
   type: imdbResponse.Type,
