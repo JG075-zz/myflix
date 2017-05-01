@@ -7,16 +7,17 @@ describe('Importer', function() {
   var myJSON = JSON.stringify(myMovies);
 
   var importer, movieStub, infoFetcherStub;
+  var fsStub = {};
 
   beforeEach(function() {
     infoFetcherStub = {
       fetch: sinon.spy(function(title, done) { done({title: title});})
     };
     movieStub = sinon.spy(function(opts) {});
-    movieStub.count = sinon.spy(function(opts, done) {
-      done();
-    });
-    importer = proxyquire('../../app/utils/importer', { '../models/movie': movieStub, '../helpers/infoFetcher': infoFetcherStub });
+    movieStub.count = sinon.spy(function(opts, done) { done();});
+    importer = proxyquire('../../app/utils/importer', { '../models/movie': movieStub,
+                                                        '../helpers/infoFetcher': infoFetcherStub,
+                                                        'fs': fsStub });
   });
 
   it('should not be an empty object', function() {
@@ -74,6 +75,15 @@ describe('Importer', function() {
     });
     importer(myJSON);
     expect(movieStub.count.calledTwice).to.be.true;
+  });
+
+  it('should save failed movies to a file', function() {
+    infoFetcherStub.fetch = function(title, done) {
+                              done({"Response":"False","Error":"Movie not found!"});
+                            };
+    fsStub.createWriteStream = sinon.spy();
+    importer(myJSON);
+    expect(fsStub.createWriteStream.called).to.be.true;
   });
 
 });

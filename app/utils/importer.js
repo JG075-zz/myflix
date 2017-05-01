@@ -43,6 +43,23 @@ function getDocumentCount(done) {
     });
 }
 
+function logFailedMovies(done) {
+  if (failedMovies.length > 0) {
+    var file = fs.createWriteStream('imports/failed.txt');
+    file.on('error', function(err) {
+      throw err;
+    });
+    failedMovies.forEach(function(movie) {
+      file.write(movie[0] + ', ' + movie[1].Error + '\n');
+    });
+    file.end(function() {
+      done();
+    });
+  } else {
+    done();
+  }
+}
+
 function importer(file) {
   var parsedFile = validateJSON(file);
   if (!parsedFile) throw new Error('No file or wrong type given');
@@ -51,14 +68,12 @@ function importer(file) {
   getDocumentCount(function(beforeCount) {
     updateAndSave(parsedFile, function(){
       getDocumentCount(function(afterCount) {
-        if(require.main === module){ // print results when called from the command line
-          console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount);
-          if (failedMovies.length > 0) console.log('Failed movies:');
-          failedMovies.forEach(function(movie) {
-            console.log(movie[0] + ', ' + movie[1].Error);
-          });
-          process.exit();
-        }
+        logFailedMovies(function() {
+          if (require.main === module) { // runs when called from the command line
+            console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount);
+            process.exit();
+          }
+        });
       });
     });
   });
