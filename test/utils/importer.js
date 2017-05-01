@@ -54,6 +54,14 @@ describe('Importer', function() {
     expect(JSON.stringify(movieStub.args) == JSON.stringify(movieTitles)).to.be.true;
   });
 
+  it('should not create a new movie if there is an error response', function() {
+    infoFetcherStub.fetch = function(title, done) {
+                              done({"Response":"False","Error":"Movie not found!"});
+                            };
+    importer(myJSON);
+    expect(movieStub.called).to.be.false;
+  });
+
   it('should save the movie to the database', function() {
     movieStub.prototype.save = sinon.spy();
     importer(myJSON);

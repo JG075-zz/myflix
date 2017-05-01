@@ -2,7 +2,8 @@ var infoFetcher = require('../helpers/infoFetcher'),
     mongoose = require('mongoose'),
     config = require('../../config/config'),
     Movie = require('../models/movie'),
-    fs = require('fs');
+    fs = require('fs'),
+    async = require('async');
 
 function validateJSON(body) {
   try {
@@ -13,20 +14,25 @@ function validateJSON(body) {
   }
 }
 
-var itemsProcessed = 0;
+var failedMovies = [];
 
 function updateAndSave(file, done) {
-  file.forEach(function(item, index, array) {
+  async.each(file, function(item, callback) {
     infoFetcher.fetch(item.title, function(updatedItem) {
-      var movie = new Movie(updatedItem);
-      movie.save(function(error) {
-        if(error) throw new Error(error);
-        itemsProcessed++;
-        if(itemsProcessed === array.length) {
-          done();
-        }
-      });
+      if (updatedItem.Response == 'False') {
+        failedMovies.push([item.title, updatedItem]);
+        callback();
+      } else {
+        var movie = new Movie(updatedItem);
+        movie.save(function(err) {
+          if(err) throw err;
+          callback();
+        });
+      }
     });
+  }, function(err) {
+    if (err) throw err;
+    done();
   });
 }
 
@@ -47,6 +53,10 @@ function importer(file) {
       getDocumentCount(function(afterCount) {
         if(require.main === module){ // print results when called from the command line
           console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount);
+          if (failedMovies.length > 0) console.log('Failed movies:');
+          failedMovies.forEach(function(movie) {
+            console.log(movie[0] + ', ' + movie[1].Error);
+          });
           process.exit();
         }
       });

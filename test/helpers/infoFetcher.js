@@ -35,6 +35,24 @@ describe('InfoFetcher', function() {
       });
     });
 
+    it('should pass the movie to #formatMovie()', function(done) {
+      var formatMovieSpy = sinon.spy(infoFetcher, 'formatMovie');
+      infoFetcher.fetch('Toy Story 3', function(movie) {
+        expect(formatMovieSpy.calledWith(testHelpers.imdbResponse));
+        done();
+      });
+    });
+
+  });
+
+  it('should return the object given if it\'s an error', function(done) {
+    fakeOmdbAPI.prototype.get = sinon.spy(function(title, done){
+      done({"Response":"False","Error":"Movie not found!"});
+    });
+    infoFetcher.fetch('Toy Story 3', function(movie) {
+      expect(movie).to.eql({"Response":"False","Error":"Movie not found!"});
+      done();
+    });
   });
 
 });
