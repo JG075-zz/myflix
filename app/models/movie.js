@@ -15,9 +15,9 @@ var movieSchema = new Schema({
   country: { type: String, required: true },
   poster: { type: String, required: true },
   ratings: {
-    meta_score: { type: String, required: true },
+    meta_score: { type: String },
     imdb_rating: { type: String, required: true },
-    rotten_tomatoes: { type: String, required: true },
+    rotten_tomatoes: { type: String },
   },
   imdb_id: { type: String, required: true },
   type: { type: String, required: true },

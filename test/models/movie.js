@@ -18,9 +18,7 @@ describe('Movie', function() {
       expect(err.errors.plot).to.exist;
       expect(err.errors.language).to.exist;
       expect(err.errors.poster).to.exist;
-      expect(err.errors['ratings.rotten_tomatoes']).to.exist;
       expect(err.errors['ratings.imdb_rating']).to.exist;
-      expect(err.errors['ratings.meta_score']).to.exist;
       expect(err.errors.imdb_id).to.exist;
       expect(err.errors.type).to.exist;
       done();
