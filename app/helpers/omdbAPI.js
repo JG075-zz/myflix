@@ -1,21 +1,12 @@
-var http = require('http');
+var request = require('request');
 
 function OmdbAPI() {}
 
-OmdbAPI.prototype.request = function (url, done) {
-  http.get(url, (res) => {
-    res.on('data', (data) => {
-      done(data);
-    });
-
-  }).on('error', (e) => {
-    throw e;
-  });
-};
-
 OmdbAPI.prototype.get = function (title, done) {
-  this.request('http://www.omdbapi.com/?t=' + title, (data) => {
-    done(JSON.parse(data.toString('utf-8')));
+  var omdbRequest = 'http://www.omdbapi.com/?t=' + title;
+  request(omdbRequest, function (err, response, body) {
+    if (err) throw err;
+    done(JSON.parse(body.toString()));
   });
 };
 
