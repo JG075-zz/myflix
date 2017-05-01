@@ -81,9 +81,15 @@ describe('Importer', function() {
     infoFetcherStub.fetch = function(title, done) {
                               done({"Response":"False","Error":"Movie not found!"});
                             };
-    fsStub.createWriteStream = sinon.spy();
+    var onStub, writeStub, endStub;
+    onStub = writeStub = endStub = sinon.stub();
+    fsStub.createWriteStream = sinon.spy(function(path) {
+      return { on: onStub, write: writeStub, end: endStub };
+    });
+    fsStub.on = sinon.stub();
     importer(myJSON);
     expect(fsStub.createWriteStream.called).to.be.true;
+    expect(onStub.called && writeStub.called && endStub.called).to.be.true;
   });
 
 });
