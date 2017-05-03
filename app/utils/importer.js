@@ -14,6 +14,15 @@ function validateJSON(body) {
   }
 }
 
+function handleError(err, movie) {
+  if(err) {
+    if (err.code !== 11000) throw err;
+    Movie.findOne(movie.title, 'released', function(err, movie) {
+
+    });
+  }
+}
+
 var failedMovies = [];
 
 function updateAndSave(file, done) {
@@ -25,7 +34,7 @@ function updateAndSave(file, done) {
       } else {
         var movie = new Movie(updatedItem);
         movie.save(function(err) {
-          if(err) throw err;
+          if (err) handleError(err, movie);
           callback();
         });
       }
@@ -38,7 +47,7 @@ function updateAndSave(file, done) {
 
 function getDocumentCount(done) {
     Movie.count({}, function(err, count) {
-      if (err) throw err;
+      if (err) throw err; //if (err) return done(err)
       done(count);
     });
 }
@@ -70,7 +79,7 @@ function importer(file) {
       getDocumentCount(function(afterCount) {
         logFailedMovies(function() {
           if (require.main === module) { // runs when called from the command line
-            console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount);
+            console.log('Import complete - Documents before: ' + beforeCount + ', after: ' + afterCount + ', added: ' + (afterCount - beforeCount));
             process.exit();
           }
         });

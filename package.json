@@ -23,7 +23,8 @@
     "mongoose": "^4.1.2",
     "morgan": "^1.6.1",
     "request": "^2.81.0",
-    "serve-favicon": "^2.3.0"
+    "serve-favicon": "^2.3.0",
+    "verror": "^1.10.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",
@@ -37,6 +38,7 @@
     "nock": "^9.0.13",
     "nyc": "^10.0.0",
     "proxyquire": "^1.7.11",
+    "rewire": "^2.5.2",
     "supertest": "^2.0.1"
   }
 }
