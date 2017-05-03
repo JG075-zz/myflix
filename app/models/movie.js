@@ -1,8 +1,9 @@
 var mongoose = require('mongoose'),
-  Schema = mongoose.Schema;
+    Schema = mongoose.Schema;
 
 var movieSchema = new Schema({
   title: { type: String, required: true },
+  year: { type: String, required: true },
   released: { type: String, required: true },
   rated: { type: String, required: true },
   runtime: { type: String, required: true },
@@ -25,6 +26,8 @@ var movieSchema = new Schema({
 {
   timestamps: true
 });
+
+movieSchema.index({ title: 1, year: 1 }, { unique: true });
 
 var Movie = mongoose.model('Movie', movieSchema);
 
