@@ -34,6 +34,7 @@ describe('Movie', function() {
     it('should accept valid entries', function(done){
       var movie = new Movie({
         title: 'Test',
+        year: '1983',
         released: '01/02/1983',
         rated: 'PG',
         runtime: '162 mins',
@@ -67,10 +68,21 @@ describe('Movie', function() {
     it('should not save a movie if the same title exists', function(done) {
       var movie = new Movie(testHelpers.formattedMovie);
       movie.save(function(err) {
-        if(err) throw err;
         var movie2 = new Movie(testHelpers.formattedMovie);
         movie2.save(function(err) {
           expect(err).to.exist;
+          done();
+        });
+      });
+    });
+
+    it('should save a movie that has a duplicate title, but a different release date', function(done) {
+      var movie = new Movie(testHelpers.formattedMovie);
+      movie.save(function(err) {
+        testHelpers.formattedMovie.year = '2000';
+        var movie2 = new Movie(testHelpers.formattedMovie);
+        movie2.save(function(err) {
+          expect(err).to.not.exist;
           done();
         });
       });
