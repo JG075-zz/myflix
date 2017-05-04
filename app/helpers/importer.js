@@ -6,6 +6,7 @@ var VError = require('verror'),
 function formatMovie(movie) {
   return {
     title: movie.Title,
+    year: movie.Year,
     released: movie.Released,
     rated: movie.Rated,
     runtime: movie.Runtime,
@@ -52,7 +53,6 @@ function updateAndSave(movies, done) {
       }
       movie = new Movie(formatMovie(updatedMovie));
       movie.save(function(err) {
-        console.log(err);
         callback();
       });
     });
