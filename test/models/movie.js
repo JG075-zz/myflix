@@ -88,6 +88,31 @@ describe('Movie', function() {
       });
     });
 
+    it('should update the urls of the documents post save', function(done) {
+      var movie = new Movie(testHelpers.formattedMovie);
+      movie.save(function(err) {
+        Movie.find({title: movie.title}, function(err, movies) {
+          expect(movies[0].url).to.eq("toy_story_3");
+          done();
+        });
+      });
+    });
+
+    it('should add the year to the url of the newest movie post save', function(done) {
+      var movie = new Movie(testHelpers.formattedMovie);
+      movie.year = '2012';
+      var movie2 = new Movie(testHelpers.formattedMovie);
+
+      movie.save(function(err) {
+        movie2.save(function(err) {
+          Movie.findById(movie._id, function(err, movie) {
+            expect(movie.url).to.eq("toy_story_3_2012");
+            done();
+          });
+        });
+      });
+    });
+
   });
 
 });

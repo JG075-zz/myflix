@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 var movieSchema = new Schema({
   title: { type: String, required: true },
   year: { type: String, required: true },
+  url: { type: String, require: true },
   released: { type: String, required: true },
   rated: { type: String, required: true },
   runtime: { type: String, required: true },
@@ -25,6 +26,29 @@ var movieSchema = new Schema({
 },
 {
   timestamps: true
+});
+
+function modifyNewestUrl(existing, saving, next, err) {
+  if (parseInt(existing.year) > parseInt(saving.year)) {
+    existing.url = existing.title + '_' + existing.year;
+    existing.save(function(err) {
+      return next(err);
+    });
+  } else {
+    saving.url = saving.url + '_' + saving.year;
+    return next(err);
+  }
+}
+
+movieSchema.pre('save', function(next) {
+  var doc = this;
+  Movie.find({ title: doc.title }, function(err, movies) {
+    doc.url = doc.title.toLowerCase().replace(/ /g,"_");
+    if (movies.length === 1) {
+      return modifyNewestUrl(movies[0], doc, next, err);
+    }
+    return next(err);
+  });
 });
 
 movieSchema.index({ title: 1, year: 1 }, { unique: true });
