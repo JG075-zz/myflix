@@ -1,5 +1,4 @@
-var VError = require('verror'),
-    async = require('async'),
+var async = require('async'),
     omdbAPI = require('./omdbAPI'),
     Movie = require('../models/movie');
 
@@ -53,11 +52,12 @@ function updateAndSave(movies, done) {
       }
       movie = new Movie(formatMovie(updatedMovie));
       movie.save(function(err) {
-        callback();
+        if (err) logFailedMovie(movie.title, err);
+        return callback();
       });
     });
-  }, function(err) {
-      done();
+  }, function (err) {
+      return done();
   });
 }
 
@@ -68,12 +68,13 @@ function updateAndSave(movies, done) {
  *
  *    done          A callback invoked when the process is completed. When sucessful
  *                  it is called with (null, results) where results is an array containing
- *                  counts of the collection documents. Otheriwse done(err, null) is called.
+ *                  counts of the collection documents, and failed movies. Else it will pass
+ *                  an error as the first argument.
  *
 */
 module.exports = function (movies, done) {
-  if (movies.constructor !== Array) throw new VError('Expected "movies" to be an array but received "%s"', movies);
-  if (movies.length === 0) throw new VError('"movies" should not be empty');
+  if (movies.constructor !== Array) throw new Error('Expected "movies" to be an array but received "' + movies.toString() + '"');
+  if (movies.length === 0) throw new Error('"movies" should not be empty');
 
   getDocumentCount(function(err, beforeCount) {
     if (err) return done(err, null);

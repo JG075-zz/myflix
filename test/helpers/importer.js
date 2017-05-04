@@ -20,18 +20,17 @@ describe('Importer', function() {
   });
 
   it('should throw an error if the first argument is not an array', function() {
-    expect(importer.bind(undefined, 'string')).to.throw(Error, 'VError: Expected "movies" to be an array but received "string"');
+    expect(importer.bind(undefined, 'string')).to.throw(Error, 'Expected "movies" to be an array but received "string"');
   });
 
   it('should throw an error if the array given is empty', function() {
     var emptyMovies = [];
-    expect(importer.bind(undefined, [])).to.throw('VError: "movies" should not be empty');
+    expect(importer.bind(undefined, [])).to.throw('"movies" should not be empty');
   });
 
   it('should save non-duplicate, valid, movies to a database', function(done) {
     importer(movies, function() {
       Movie.find({}, function(err, movies) {
-        console.log(err);
         expect(movies.length).to.eq(3);
         done();
       });
