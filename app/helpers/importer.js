@@ -45,7 +45,7 @@ function logFailedMovie(title, err) {
 function updateAndSave(movies, done) {
   async.each(movies, function(movie, callback) {
     var myMovie = movie;
-    omdbAPI.get(movie.title, function(err, updatedMovie) {
+    omdbAPI.get(movie.title, movie.year, function(err, updatedMovie) {
       if (err) {
         logFailedMovie(movie.title, err);
         return callback();
