@@ -70,5 +70,25 @@ describe('Importer', function() {
     });
   });
 
+  it('should not throw an error if Ratings aren\'t present', function(done) {
+    var res = testHelpers.createImdbReponse(movies[0]);
+    res.Ratings = [];
+    omdbStub.get.withArgs(movies[0].title).yields(null, res);
+    importer(movies, function(err, results) {
+      Movie.findOne({ title: movies[0].title }, function(err, movie) {
+        expect(movie.ratings.rotten_tomatoes).to.eq('N/A');
+        done();
+      });
+    });
+  });
+
+  it('should find and add the Rotten Tomatoes rating if available', function(done) {
+    importer(movies, function(err, results) {
+      Movie.findOne({ title: movies[0].title }, function(err, movie) {
+        expect(movie.ratings.rotten_tomatoes).to.eq('99%');
+        done();
+      });
+    });
+  });
 
 });
