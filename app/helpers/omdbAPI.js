@@ -16,21 +16,24 @@ module.exports = {
   get: function(title, year, done) {
     if (typeof year === "function"){
       done = year; // set second argument to callback
-      year = "";
+      year = null;
     }
-    var omdbRequest = 'http://www.omdbapi.com/?t=' + title + "&y=" + year;
+
+    var omdbRequest = 'http://www.omdbapi.com/?t=' + title;
+    if (year) omdbRequest += "&y=" + year;
+
     request({
       url: omdbRequest,
       maxAttempts: 5,
       retryDelay: 5000,
       retryStrategy: request.RetryStrategies.HTTPOrNetworkError
     }, function (err, response, body) {
-      if (err) return done(err, null);
+        if (err) return done(err, null);
 
-      var parsedBody = (JSON.parse(body));
+        var parsedBody = (JSON.parse(body));
 
-      if (parsedBody.Response == 'False') return done(parsedBody, null);
-      return done(null, parsedBody);
+        if (parsedBody.Response == 'False') return done(parsedBody, null);
+        return done(null, parsedBody);
     });
   }
 };

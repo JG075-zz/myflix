@@ -33,7 +33,7 @@ describe('Omdb', function() {
 
     it('should not append a year when none is given', function(done) {
       omdbAPI.get('Toy Story 3', function(err, data) {
-        expect(requestStub.args[0][0].url).to.eql('http://www.omdbapi.com/?t=Toy Story 3&y=');
+        expect(requestStub.args[0][0].url).to.eql('http://www.omdbapi.com/?t=Toy Story 3');
         done();
       });
     });
