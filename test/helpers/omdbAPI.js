@@ -1,55 +1,56 @@
-var assert = require('chai').assert,
-    nock = require('nock'),
-    OmdbAPI = require('../../app/helpers/omdbAPI');
-
-var omdbAPI = new OmdbAPI();
+var expect = require('chai').expect,
+    sinon = require('sinon'),
+    proxyquire = require('proxyquire'),
+    omdbAPI = require('../../app/helpers/omdbAPI'),
+    testHelpers = require('../testHelpers');
 
 describe('Omdb', function() {
+
+  var movie = { title: 'Toy Story 3', year: '2012' };
+  var omdbAPI, requestStub;
+
   beforeEach(function() {
-    var omdbResponse = { Title: 'Oz',
-      Year: '1997–2003',
-      Rated: 'TV-MA',
-      Released: '12 Jul 1997',
-      Runtime: '55 min',
-      Genre: 'Crime, Drama, Romance',
-      Director: 'N/A',
-      Writer: 'Tom Fontana',
-      Actors: 'Ernie Hudson, J.K. Simmons, Lee Tergesen, Dean Winters',
-      Plot: 'A series chronicling the daily activities of an unusual prison facility and its criminal inhabitants.',
-      Language: 'English',
-      Country: 'USA',
-      Awards: 'Nominated for 2 Primetime Emmys. Another 14 wins & 51 nominations.',
-      Poster: 'https://images-na.ssl-images-amazon.com/images/M/MV5BOTAxOTg2ODM3MF5BMl5BanBnXkFtZTgwMjIyMzgwMzE@._V1_SX300.jpg',
-      Metascore: 'N/A',
-      imdbRating: '8.8',
-      imdbVotes: '70,385',
-      imdbID: 'tt0118421',
-      Type: 'series',
-      totalSeasons: '6',
-      Response: 'True'
-    };
-
-    nock('http://www.omdbapi.com')
-      .get('/?t=Oz')
-      .reply(200, omdbResponse);
-  });
-
-  it('should instatiate a new object', function() {
-    assert.isObject(omdbAPI);
+    requestStub = sinon.stub();
+    requestStub.yields(null, null, JSON.stringify(testHelpers.createImdbReponse(movie)));
+    omdbAPI = proxyquire('../../app/helpers/omdbAPI', { 'request': requestStub });
   });
 
   describe('#get()', function() {
 
-    it('should return an object', function(done) {
-      omdbAPI.get('Oz', function(data) {
-        assert.isObject(data);
+    it('should give back the fake IMDB response', function(done){
+      omdbAPI.get('Toy Story 3', function(err, data) {
+        expect(JSON.stringify(data)).to.eq(JSON.stringify(testHelpers.createImdbReponse(movie)));
         done();
       });
     });
 
-    it('should have a \'rating\' property', function(done){
-      omdbAPI.get('Oz', function(data) {
-        assert.notTypeOf(data.imdbRating, 'undefined');
+    it('should pass request the api url, title, and year when year is given', function(done) {
+      omdbAPI.get('Toy Story 3', '2012', function(err, data) {
+        expect(requestStub.calledWith('http://www.omdbapi.com/?t=Toy Story 3&y=2012')).to.be.true;
+        done();
+      });
+    });
+
+    it('should not append a year when none is given', function(done) {
+      omdbAPI.get('Toy Story 3', function(err, data) {
+        expect(requestStub.calledWith('http://www.omdbapi.com/?t=Toy Story 3&y=')).to.be.true;
+        done();
+      });
+    });
+
+    it('should give the callback the error received from request', function(done) {
+      requestStub.yields(new Error('Not found'), null, null);
+      omdbAPI.get('Toy Story 3', function(err, data) {
+        expect(err).to.exist;
+        done();
+      });
+    });
+
+    it('should give the callback the error received from OmdbAPI', function(done) {
+      var error = { Response : "False", Error : "Movie not found!" };
+      requestStub.yields(null, null, JSON.stringify(error));
+      omdbAPI.get('Toy Story 3', function(err, data) {
+        expect(JSON.stringify(err)).to.eql(JSON.stringify(error));
         done();
       });
     });
