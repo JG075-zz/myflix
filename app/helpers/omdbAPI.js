@@ -1,4 +1,4 @@
-var request = require('request');
+var request = require('requestretry');
 
 /*
  * Interacts with the OMDB API. Arguments:
@@ -19,7 +19,12 @@ module.exports = {
       year = "";
     }
     var omdbRequest = 'http://www.omdbapi.com/?t=' + title + "&y=" + year;
-    request(omdbRequest, function (err, response, body) {
+    request({
+      url: omdbRequest,
+      maxAttempts: 5,
+      retryDelay: 5000,
+      retryStrategy: request.RetryStrategies.HTTPOrNetworkError
+    }, function (err, response, body) {
       if (err) return done(err, null);
 
       var parsedBody = (JSON.parse(body));

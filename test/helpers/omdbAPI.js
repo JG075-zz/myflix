@@ -12,7 +12,7 @@ describe('Omdb', function() {
   beforeEach(function() {
     requestStub = sinon.stub();
     requestStub.yields(null, null, JSON.stringify(testHelpers.createImdbReponse(movie)));
-    omdbAPI = proxyquire('../../app/helpers/omdbAPI', { 'request': requestStub });
+    omdbAPI = proxyquire('../../app/helpers/omdbAPI', { 'requestretry': requestStub });
   });
 
   describe('#get()', function() {
@@ -26,14 +26,14 @@ describe('Omdb', function() {
 
     it('should pass request the api url, title, and year when year is given', function(done) {
       omdbAPI.get('Toy Story 3', '2012', function(err, data) {
-        expect(requestStub.calledWith('http://www.omdbapi.com/?t=Toy Story 3&y=2012')).to.be.true;
+        expect(requestStub.args[0][0].url).to.eql('http://www.omdbapi.com/?t=Toy Story 3&y=2012');
         done();
       });
     });
 
     it('should not append a year when none is given', function(done) {
       omdbAPI.get('Toy Story 3', function(err, data) {
-        expect(requestStub.calledWith('http://www.omdbapi.com/?t=Toy Story 3&y=')).to.be.true;
+        expect(requestStub.args[0][0].url).to.eql('http://www.omdbapi.com/?t=Toy Story 3&y=');
         done();
       });
     });
