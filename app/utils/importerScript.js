@@ -1,7 +1,9 @@
 var mongoose = require('mongoose'),
-    fs = require('fs'),
-    config = require('../../config/config'),
-    importer = require('../helpers/importer');
+fs = require('fs'),
+config = require('../../config/config'),
+logger = require('./logger'),
+importer = require('../helpers/importer'),
+async = require('async');
 
 mongoose.Promise = global.Promise;
 mongoose.connect(config.db);
@@ -22,9 +24,22 @@ imported.forEach(function(movie, index, arr) {
 });
 
 importer(imported, function(err, results) {
-  if (err) console.log(err);
+  if (err) logger.error(err);
+  logger.info('Import complete - Documents before: ' + results.beforeCount + ', after: ' + results.afterCount + ', added: ' + results.added);
 
-  console.log('Import complete - Documents before: ' + results.beforeCount + ', after: ' + results.afterCount + ', added: ' + results.added);
-  console.log('Failed movies: ' + JSON.stringify(results.failedMovies));
-  process.exit();
+  var file = fs.createWriteStream('imports/failed/' + Date() + '.txt');
+  file.on('error', function(err) { logger.error(err); });
+
+  async.each(results.failedMovies, function(movie, callback) {
+    file.write(JSON.stringify(movie) + '\n');
+    callback();
+  }, function(err) {
+    if (err) logger.error(err);
+
+    file.end();
+    setTimeout(function(){
+      process.exit();
+    }, 3000);
+  });
+
 });
