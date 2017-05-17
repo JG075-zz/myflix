@@ -86,5 +86,14 @@ function createImdbReponse(movie) {
 module.exports = {
   createImdbReponse: createImdbReponse,
   imdbResponse: imdbResponse,
-  formattedMovie: formattedMovie
+  formattedMovie: formattedMovie,
+  generateMoviesArray: function(times) {
+    var response = [];
+    for (var i = 0; i < times; i++) {
+      var movie = JSON.parse(JSON.stringify(formattedMovie));
+      movie.title += i;
+      response.push(movie);
+    }
+    return response;
+  }
 };
