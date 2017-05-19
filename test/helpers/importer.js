@@ -91,4 +91,16 @@ describe('Importer', function() {
     });
   });
 
+  it('should convert the released date into a Date format', function(done) {
+    var res = testHelpers.createImdbReponse(movies[0]);
+    omdbStub.get.withArgs(movies[0].title).yields(null, res);
+    importer(movies, function(err, results) {
+      Movie.findOne({ title: movies[0].title }, function(err, movie) {
+        console.log(movie.released);
+        expect(JSON.stringify(movie.released)).to.eq(JSON.stringify(new Date(2010, 5, 18)));
+        done();
+      });
+    });
+  });
+
 });

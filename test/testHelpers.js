@@ -83,6 +83,11 @@ function createImdbReponse(movie) {
     Response: 'True'
   };
 }
+function getRandomDate(from, to) {
+    from = from.getTime();
+    to = to.getTime();
+    return new Date(from + Math.random() * (to - from));
+}
 module.exports = {
   createImdbReponse: createImdbReponse,
   imdbResponse: imdbResponse,

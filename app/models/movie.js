@@ -5,7 +5,7 @@ var movieSchema = new Schema({
   title: { type: String, required: true },
   year: { type: String, required: true },
   url: { type: String, require: true },
-  released: { type: String, required: true },
+  released: { type: Date, required: true },
   rated: { type: String, required: true },
   runtime: { type: String, required: true },
   genre: { type: String, required: true },
