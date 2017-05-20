@@ -63,6 +63,22 @@ describe('API Route', function() {
       });
     });
 
+    it("should display the second page of results", function(done){
+      var movies = testHelpers.generateMoviesArray(30);
+      movies[0].released = '06 Jan 2001';
+      Movie.collection.insert(movies, function(err, docs) {
+        if (err) throw err;
+        request(app)
+          .get('/api/movies?page=2')
+          .end(function(err, res){
+             if (err) throw err;
+             expect(res.body).to.have.length.within(1, 10);
+             expect(res.body[res.body.length - 1].title).to.eql(movies[0].title);
+             done();
+          });
+      });
+    });
+
   });
 
 });

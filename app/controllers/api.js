@@ -5,11 +5,10 @@ exports.index = function(req, res) {
 };
 
 exports.movies = function(req, res) {
-  // give back a json array of movie objects
-  // should be limited to the first page e.g. first 20 results
-  // should be sorted by release date (newest - oldest)
+  var limit = 20;
+  var page = req.query.hasOwnProperty('page') ? req.query.page - 1 : 0;
 
-  Movie.find().sort('-released').limit(20).exec(function(error, movies) {
+  Movie.find().sort('-released').skip(page * limit).limit(limit).exec(function(error, movies) {
     if (error) {
       return res.send(400, {
         message: error
@@ -17,6 +16,5 @@ exports.movies = function(req, res) {
     }
 
     res.send(movies);
-
   });
 };

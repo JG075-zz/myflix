@@ -1,16 +1,22 @@
 var expect = require('chai').expect,
     sinon = require('sinon'),
-    mongoSetup = require('../mongoSetup'),
-    movieModel = require('../../app/models/movie'),
-    apiController = require('../../app/controllers/api'),
+    proxyquire = require('proxyquire'),
     testHelpers = require('../testHelpers');
 
 describe('API Controller', function() {
-  var req, res;
+  var req, res, apiController, movieStub;
 
   beforeEach(function(){
-    req = sinon.spy();
+    req = { query: {} };
     res = { send: sinon.spy() };
+    movieStub = {
+      find: sinon.stub().returnsThis(),
+      sort: sinon.stub().returnsThis(),
+      skip: sinon.stub().returnsThis(),
+      limit: sinon.stub().returnsThis(),
+      exec: function (cb) { cb(null, testHelpers.generateMoviesArray(30));}
+    };
+    apiController = proxyquire('../../app/controllers/api', { '../models/movie': movieStub });
   });
 
   describe('#index()', function() {
@@ -23,36 +29,17 @@ describe('API Controller', function() {
   describe('#movies()', function() {
 
     it('should call send with an array of movie objects', function() {
-      sinon.stub(movieModel, 'find').returns({ sort: function() {
-        return {
-          limit: function() {
-            return {
-              exec: function (cb) { cb(null, testHelpers.generateMoviesArray(30));}
-            };
-          }
-        };
-      }});
       apiController.movies(req, res);
       expect(res.send.args[0][0]).to.have.length.above(0);
-      movieModel.find.restore();
     });
 
     it('should send an error response if there is an error', function() {
-      sinon.stub(movieModel, 'find').returns({ sort: function() {
-        return {
-          limit: function() {
-            return {
-              exec: function (cb) {
-                cb(400, { message: "error" }, testHelpers.generateMoviesArray(30));
-              }
-            };
-          }
-        };
-      }});
+      movieStub.exec = function (cb) {
+        cb(400, { message: "error" }, testHelpers.generateMoviesArray(30));
+      };
       apiController.movies(req, res);
       expect(res.send.calledWith(400)).to.be.true;
       expect(res.send.args[0][1].hasOwnProperty("message")).to.be.true;
-      movieModel.find.restore();
     });
 
   });
